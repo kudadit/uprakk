@@ -1,0 +1,94 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #a3a3a3d5;
+}
+
+.invoice {
+    max-width: 800px;
+    margin: auto;
+    background-color: rgb(255, 255, 255);
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.store-info {
+    text-align: center;
+    padding: 10px;
+    flex: 0;
+}
+
+.store-info h1 {
+    margin: 50;
+    font-size: 35px;
+}
+
+.logo-container {
+    text-align: flex-end;
+    padding: 35px;
+}
+
+.logo {
+    height: 70px;
+}
+
+.invoice-details,
+.item-entry,
+.totals {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.invoice-details .left,
+.invoice-details .right {
+    width: 48%;
+}
+
+.total {
+    font-size: 24px;
+    color: red;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+table th,
+table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+.totals {
+    display: flex;
+    justify-content: space-between;
+}
+
+.totals .subtotal,
+.totals .payment {
+    width: 48%;
+}

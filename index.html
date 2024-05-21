@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <div id="app">
+        <div class="invoice">
+            <header>
+                <div class="store-info">    
+                    <h1>PT.UPRAK</h1>
+                </div>
+                <div class="logo-container">
+                   <a href="https://www.instagram.com/kudadit/" ><img src="images/image.png" alt="Logo" class="logo"></a> 
+                </div>
+            </header>
+            <div class="invoice-details">
+                <div class="left">
+                    <p>No. Nota: <input type="text" v-model="nota.noNota" disabled></p>
+                    <p>Pelanggan: <input type="text" v-model="nota.pelanggan"></p>
+                    <p>Tanggal: <input type="date" v-model="nota.tanggal"></p>
+                </div>
+                <div class="right">
+                    <h2>Total Pembayaran:</h2>
+                    <p class="total">{{ formatCurrency(totalPembayaran) }}</p>
+                </div>
+            </div>
+            <div class="item-entry">
+                <p>Kode Barang: 
+                    <select v-model="newItem.kodeBarang">
+                        <option disabled value="">ID Barang</option>
+                        <option v-for="item in items" :key="item.id" :value="item.id">{{ item.id }}</option>
+                    </select>
+                </p>
+                <p>Nama Barang: <input type="text" v-model="newItem.namaBarang" :disabled="!newItem.kodeBarang"></p>
+                <p>Quantity: <input type="number" min="0" v-model="newItem.quantity"></p>
+                <button @click="addItem" :disabled="!newItem.kodeBarang || !newItem.quantity || newItem.quantity <= 0">Tambah</button>
+            </div>
+            <table class="keranjang">
+                <thead>
+                    <tr>
+                        <th>ID Barang</th>
+                        <th>Nama Barang</th>
+                        <th>Harga Satuan</th>
+                        <th>Qty</th>
+                        <th>Jumlah</th>
+                        <th>Opsi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(item, index) in nota.items" :key="index">
+                        <td>{{ item.kodeBarang }}</td>
+                        <td>{{ item.namaBarang }}</td>
+                        <td>{{ formatCurrency(item.hargaSatuan) }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ formatCurrency(item.jumlah) }}</td>
+                        <td><button @click="removeItem(index)">Hapus</button></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="totals">
+                <div class="subtotal">
+                    <p>Sub Total: <span>{{ formatCurrency(subTotal) }}</span></p>
+                    <p>Diskon: <input type="number" min ="0" max="100" v-model="nota.diskon"> % = <span>{{ formatCurrency(diskon) }}</span></p>
+                    <p>Total Harga: <span>{{ formatCurrency(totalHarga) }}</span></p>
+                </div>
+                <div class="payment">
+                    <p>Bayar: <input type="number" min="0" v-model="nota.bayar"></p>
+                    <p>Kembalian: <span>{{ formatCurrency(kembalian) }}</span></p>
+                    <button @click="selesai" :disabled="nota.bayar < totalHarga">Selesai</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                nota: {
+                    noNota: '12345',
+                    pelanggan: '',
+                    tanggal: '',
+                    items: [],
+                    diskon: 0,
+                    bayar: 0
+                },
+                items: [
+                    { id: '001', nama: 'Jaket', harga: 100000 },
+                    { id: '002', nama: 'Sepatu', harga: 200000 },
+                    { id: '003', nama: 'Celana dalam', harga: 300000 }
+                ],
+                newItem: {
+                    kodeBarang: '',
+                    namaBarang: '',
+                    quantity: 1
+                }
+            },
+            computed: {
+                subTotal() {
+                    return this.nota.items.reduce((sum, item) => sum + item.jumlah, 0);
+                },
+                diskon() {
+                    return (this.subTotal * this.nota.diskon) / 100;
+                },
+                totalHarga() {
+                    return this.subTotal - this.diskon;
+                },
+                totalPembayaran() {
+                    return this.totalHarga;
+                },
+                kembalian() {
+                    return this.nota.bayar - this.totalHarga;
+                }
+            },
+            methods: {
+                formatCurrency(value) {
+                    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(value);
+                },
+                addItem() {
+                    const item = this.items.find(i => i.id === this.newItem.kodeBarang);
+                    if (item) {
+                        this.nota.items.push({
+                            kodeBarang: item.id,
+                            namaBarang: item.nama,
+                            hargaSatuan: item.harga,
+                            quantity: this.newItem.quantity,
+                            jumlah: item.harga * this.newItem.quantity
+                        });
+                        this.newItem.kodeBarang = '';
+                        this.newItem.namaBarang = '';
+                        this.newItem.quantity = 1;
+                    }
+                },
+                removeItem(index) {
+                    this.nota.items.splice(index, 1);
+                },
+                selesai() {
+                    alert('Transaksi selesai!');
+                    this.resetFields();
+                },
+                resetFields() {
+                    this.nota = {
+                        noNota: '12345',
+                        pelanggan: '',
+                        tanggal: '',
+                        items: [],
+                        diskon: 0,
+                        bayar: 0
+                    };
+                    this.newItem = {
+                        kodeBarang: '',
+                        namaBarang: '',
+                        quantity: 1
+                    };
+                }
+            }
+        });
+    </script>
+</body>
+</html>
